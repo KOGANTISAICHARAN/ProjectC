@@ -1,0 +1,150 @@
+# ---------------------------------------------------------------------------
+# Local development stack — and the demo fallback.
+#
+#   docker compose up --build
+#
+# This must keep working for the life of the project. Conference wifi fails,
+# Render deploys stall, and the ability to run the entire product from a laptop
+# with no internet is the difference between a demo and an apology.
+# ---------------------------------------------------------------------------
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: headwaters
+      POSTGRES_PASSWORD: headwaters
+      POSTGRES_DB: headwaters
+    # NOT published to the host. `make psql` reaches it through the compose
+    # network, and exposing a database on a laptop port invites exactly the
+    # stray `user "postgres"` login attempts you would otherwise see in this
+    # log. For a GUI client, run:
+    #   docker compose run --rm --service-ports -p 127.0.0.1:5432:5432 db
+    expose:
+      - "5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U headwaters -d headwaters"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      ENVIRONMENT: local
+      LOG_LEVEL: DEBUG
+      # PRIVILEGED: migrations and the bootstrap step. Bypasses RLS.
+      DATABASE_URL: postgresql+psycopg://headwaters:headwaters@db:5432/headwaters
+      # UNPRIVILEGED: every read and write made on behalf of a user. RLS applies.
+      # The API refuses to start if this role can bypass RLS, so local
+      # development exercises the same tenancy path as production.
+      DATABASE_URL_APP: postgresql+psycopg://headwaters_app:local-dev-only@db:5432/headwaters
+      APP_DB_PASSWORD: local-dev-only
+      ALLOWED_ORIGINS: http://localhost:${WEB_PORT:-3100}
+      # Real values go in backend/.env (git-ignored); compose reads it if present.
+      TI_MODE: cached
+    env_file:
+      - path: ./backend/.env
+        required: false
+    ports:
+      # Bound to 127.0.0.1 explicitly: a dev API that parses hostile email has
+      # no business listening on the LAN. Override with API_PORT=... in .env.
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    volumes:
+      # Bind-mount for reload during development. The production image is
+      # self-contained and mounts nothing.
+      - ./backend:/srv
+      # Read-only so the extension's contract tests run under `make test`.
+      # Its files are assets under test, never something the API can modify.
+      - ./extension:/extension:ro
+    # Migrations run BEFORE the server accepts traffic. In production this is
+    # Render's pre-deploy command, gated by /readyz, so a failed migration never
+    # takes traffic. Locally the same ordering is preserved here.
+    # Migrations, then the role bootstrap, then the server. The bootstrap
+    # grants the application role its login credential -- a password must never
+    # live in a migration file. /readyz gates traffic in production, so a failure
+    # in either step never serves.
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m app.db.bootstrap &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+    environment:
+      # Server-side only: the browser never talks to FastAPI directly.
+      API_BASE_URL: http://api:8000
+    env_file:
+      - path: ./frontend/.env
+        required: false
+    ports:
+      # Default 3100, not 3000. Port 3000 is the single most contended port on a
+      # developer machine, and a *specific* bind (another app on [::1]:3000)
+      # silently beats Docker's wildcard bind on macOS -- the dashboard then
+      # appears to serve someone else's application. Override with WEB_PORT.
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
+    volumes:
+      - ./frontend:/srv
+      # Anonymous volume keeps the image's node_modules from being shadowed by
+      # the bind mount — the classic Next-in-Docker failure.
+      - /srv/node_modules
+      - /srv/.next
+    depends_on:
+      - api
+
+  worker:
+    # Same image as the API, different command. Sharing the build means
+    # services/ can never drift between the two processes.
+    build:
+      context: ./backend
+      target: runtime
+    environment:
+      ENVIRONMENT: local
+      LOG_LEVEL: DEBUG
+      # The worker is a system actor spanning every organisation and is
+      # expected to bypass RLS. It is given ONLY the system URL -- with no
+      # DATABASE_URL_APP it cannot accidentally serve a user-facing read.
+      DATABASE_URL: postgresql+psycopg://headwaters:headwaters@db:5432/headwaters
+      TI_MODE: cached
+    env_file:
+      - path: ./backend/.env
+        required: false
+    volumes:
+      - ./backend:/srv
+    command: ["python", "-m", "app.workers.runner"]
+    # The worker waits for the schema itself (see app/workers/runner.py), so a
+    # restart converges rather than looping. This is belt to that braces.
+    restart: unless-stopped
+    # The image's default HEALTHCHECK probes HTTP on :8000, which this process
+    # does not serve -- it would fail forever and restart-loop the container.
+    # Replaced with a heartbeat freshness check that proves the loop is turning.
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import os, sys, time
+          p = os.environ.get("WORKER_HEARTBEAT", "/tmp/headwaters-worker.heartbeat")
+          sys.exit(0 if os.path.exists(p) and time.time() - os.path.getmtime(p) < 60 else 1)
+      interval: 20s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    # SIGTERM is handled cooperatively: the worker finishes its current job and
+    # stops before claiming another, so a deploy does not strand a lease.
+    stop_grace_period: 30s
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

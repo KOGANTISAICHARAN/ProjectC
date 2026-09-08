@@ -1,0 +1,91 @@
+# Render Blueprint. Infrastructure as code so a deploy is reviewable in a pull
+# request rather than assembled by clicking.
+#
+#   1. Push this repository to GitHub.
+#   2. Render dashboard -> New -> Blueprint -> select the repo.
+#   3. Fill the values marked `sync: false` (they are secrets and are
+#      deliberately absent from version control).
+#
+# The API and the worker share ONE image with two start commands, so
+# services/ can never drift between the process that accepts an upload and the
+# process that enriches it.
+
+services:
+  - type: web
+    name: headwaters-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    # Starter, not Free. The free tier spins down after 15 minutes idle and
+    # cold-starts in roughly 50 seconds; for a service an analyst reaches for
+    # while triaging, that is the difference between a tool and a nuisance.
+    plan: starter
+    region: singapore
+    healthCheckPath: /readyz
+    # Migrations and the role bootstrap run BEFORE the new image takes traffic.
+    # /readyz gates the cutover, so a failed migration never serves.
+    preDeployCommand: "alembic upgrade head && python -m app.db.bootstrap"
+    dockerCommand: >
+      gunicorn app.main:app
+      --worker-class uvicorn.workers.UvicornWorker
+      --workers 2 --bind 0.0.0.0:8000
+      --access-logfile - --error-logfile -
+      --timeout 60 --graceful-timeout 30
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TI_MODE
+        value: cached
+      # PRIVILEGED: migrations and bootstrap only.
+      - key: DATABASE_URL
+        sync: false
+      # UNPRIVILEGED: every request. MUST authenticate as headwaters_app.
+      # The API refuses to start if this role can bypass row-level security --
+      # on Supabase, `postgres` is a superuser and would disable every policy.
+      - key: DATABASE_URL_APP
+        sync: false
+      - key: APP_DB_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: EVIDENCE_SIGNING_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL_EXTRACT
+        value: gpt-4o-mini
+      - key: OPENAI_MODEL_NARRATIVE
+        value: gpt-4.1
+      - key: PROMPT_VERSION
+        value: v1
+      - key: SENTRY_DSN
+        sync: false
+
+  - type: worker
+    name: headwaters-worker
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: singapore
+    dockerCommand: "python -m app.workers.runner"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TI_MODE
+        value: live
+      # The worker is a system actor spanning every organisation and is expected
+      # to bypass RLS. It is given ONLY the privileged URL: with no
+      # DATABASE_URL_APP it cannot accidentally serve a user-facing read.
+      - key: DATABASE_URL
+        sync: false
+      - key: EVIDENCE_SIGNING_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false

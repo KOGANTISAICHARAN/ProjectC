@@ -1,0 +1,68 @@
+Received: from IN-MUM-01.mail.protection.outlook.com (10.20.4.11) by
+ mailgw.kaverifs.com (10.20.4.2) with Microsoft SMTP Server id 15.20.7429.19;
+ Tue, 2 Sep 2026 09:41:06 +0530
+Received: from MUMPR01MB4417.indprd01.prod.outlook.com (2001:db8:2::17) by
+ IN-MUM-01.mail.protection.outlook.com (2001:db8:2::4) with Microsoft SMTP
+ Server id 15.20.7429.19; Tue, 2 Sep 2026 09:40:58 +0530
+Received: from mx-inbound.kaverifs-corp.com (203.0.113.41) by
+ MUMPR01MB4417.indprd01.prod.outlook.com (2001:db8:2::17) with Microsoft SMTP
+ Server id 15.20.7429.19 via Frontend Transport; Tue, 2 Sep 2026 09:40:44 +0530
+Received: from vps-77-lon (198.51.100.9) by mx-inbound.kaverifs-corp.com
+ (203.0.113.41) with ESMTP id 4b21f8c9; Tue, 2 Sep 2026 10:07:31 +0530
+Received: from [10.0.0.14] (unknown [10.0.0.14]) by vps-77-lon (Postfix)
+ with ESMTPSA id 9f2a1c; Tue, 2 Sep 2026 09:39:02 +0530
+Authentication-Results: kaverifs.com; spf=pass (sender IP is 203.0.113.41)
+ smtp.mailfrom=mail.kaverifs-corp.com; dkim=pass (signature was verified)
+ header.d=kaverifs-corp.com header.s=selector1; dmarc=pass action=none
+ header.from=kaverifs-corp.com
+Authentication-Results: kaverifs.com; spf=pass
+ smtp.mailfrom=kaverifs.com; dkim=pass header.d=kaverifs.com;
+ dmarc=pass header.from=kaverifs.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=kaverifs-corp.com; s=selector1; t=1788337124;
+ h=from:reply-to:to:subject:date:message-id:mime-version:content-type;
+ bh=2jmj7l5rSw0yVb/vlWAYkK/YBwk=;
+ b=Xk9pQm2vN8hLzR4tYwCsE6dFgA1bJ7uV0nMcT3rPyK5oI2eW8sD4fH6jL9aZxQ1B
+Return-Path: <bounce-8821@mail.kaverifs-corp.com>
+From: "Anand Rao" <a.rao@kaverifs-corp.com>
+Reply-To: a.rao@kaverifs-corp.net
+To: "Priya Menon" <p.menon@kaverifs.com>
+Subject: Re: Project Lantern - payment authorisation required today
+Date: Tue, 2 Sep 2026 09:38:44 +0530
+Message-ID: <20260902T0408.9f2a1c@vps-77-lon.hostwinds.test>
+X-Mailer: PHPMailer 6.9.1
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="b1_9f2a1c88213"
+
+--b1_9f2a1c88213
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Priya,
+
+The Lantern closing has been brought forward. I need the retention payment
+released to the escrow agent before 16:00 today or we lose the window.
+
+Revised beneficiary details are in the attached note. Please do not discuss
+this with anyone - including the CFO - until the announcement on Thursday.
+
+I am in board sessions all day, so do not call; confirm through the vendor
+portal instead:
+https://kaverifs-corp.com/vendor-portal/verify?ref=KFS-88213
+
+Amount: INR 47,80,000. This is time-critical.
+
+Anand Rao
+Chief Executive Officer
+Kaveri Financial Services Ltd
+Sent from my iPhone
+
+--b1_9f2a1c88213
+Content-Type: application/pdf; name="Revised_Vendor_Bank_Details_KFS.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="Revised_Vendor_Bank_Details_KFS.pdf"
+
+JVBERi0xLjQKJSBTeW50aGV0aWMgZGVtbyBhdHRhY2htZW50IC0gbm90IGEgcmVhbCBQREYgcGF5
+bG9hZC4gQmVuZWZpY2lhcnk6IEFDIDkwMDIzMTg4NzcyMSAvIElGU0MgVEVTVDAwMDA5OTkK
+
+--b1_9f2a1c88213--

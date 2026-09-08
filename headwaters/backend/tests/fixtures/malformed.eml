@@ -1,0 +1,13 @@
+Received: from nowhere by somewhere; not-a-date
+From: broken@@example.invalid
+From: "Second From Header" <also-broken@example.invalid>
+Subject: =?utf-8?B?bm90LXZhbGlkLWJhc2U2NA?=
+Date: 32 Foo 2026 99:99:99 +9999
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="never-closed"
+
+--never-closed
+Content-Type: text/plain; charset="definitely-not-a-charset"
+Content-Transfer-Encoding: base64
+
+!!!!not-base64-at-all!!!!

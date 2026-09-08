@@ -1,0 +1,30 @@
+# Minimal offline network table.
+#
+# PROVENANCE: hand-curated, NOT a commercial geolocation database. It exists so
+# the platform reports network context in environments where no MaxMind GeoLite2
+# .mmdb is installed, and every value it returns is labelled with this source so
+# a reader can see it did not come from a geolocation provider.
+#
+# Drop GeoLite2-ASN.mmdb / GeoLite2-Country.mmdb into this directory and the
+# resolver prefers them automatically.
+#
+# The 192.0.2/198.51.100/203.0.113 and 2001:db8:: entries are the RFC 5737 and
+# RFC 3849 documentation ranges used by the synthetic corpus. They are marked as
+# such rather than being given an invented country.
+prefix,asn,org,country,network_type,note
+192.0.2.0/24,0,RFC 5737 documentation range,,documentation,synthetic corpus only
+198.51.100.0/24,0,RFC 5737 documentation range,,documentation,synthetic corpus only
+203.0.113.0/24,0,RFC 5737 documentation range,,documentation,synthetic corpus only
+2001:db8::/32,0,RFC 3849 documentation range,,documentation,synthetic corpus only
+8.8.8.0/24,15169,Google LLC,US,datacenter,
+209.85.128.0/17,15169,Google LLC,US,datacenter,
+142.250.0.0/15,15169,Google LLC,US,datacenter,
+40.92.0.0/15,8075,Microsoft Corporation,US,datacenter,
+40.107.0.0/16,8075,Microsoft Corporation,US,datacenter,
+52.100.0.0/14,8075,Microsoft Corporation,US,datacenter,
+104.47.0.0/17,8075,Microsoft Corporation,US,datacenter,
+13.107.0.0/16,8075,Microsoft Corporation,US,datacenter,
+3.0.0.0/9,16509,Amazon.com Inc,US,datacenter,
+54.240.0.0/18,16509,Amazon.com Inc,US,datacenter,
+167.89.0.0/17,11377,SendGrid,US,esp,
+198.2.128.0/18,29873,Mailgun,US,esp,

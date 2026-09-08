@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forensic report {{ case.ref }}</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font: 10.5pt/1.5 "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+         color: #111917; background: #fff; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 4pt; letter-spacing: -.01em; }
+  h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: .12em;
+       border-bottom: 1.5pt solid #111917; padding-bottom: 3pt;
+       margin: 20pt 0 8pt; page-break-after: avoid; }
+  h3 { font-size: 10pt; margin: 12pt 0 4pt; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 8.5pt; }
+  .muted { color: #5d6e68; }
+  .lead { color: #2f3e39; }
+  header.doc { border-bottom: 2.5pt solid #111917; padding-bottom: 10pt; }
+  .kicker { font-family: ui-monospace, monospace; font-size: 8pt; letter-spacing: .14em;
+            text-transform: uppercase; color: #5d6e68; }
+  .verdict { display: flex; align-items: baseline; gap: 14pt; margin: 10pt 0; }
+  .score { font-family: ui-monospace, monospace; font-size: 30pt; font-weight: 700; }
+  .band  { font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .crit { color: #a4372a; } .warn { color: #8a6210; } .ok { color: #1d6a57; }
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 4pt 0 10pt; }
+  th { text-align: left; font-family: ui-monospace, monospace; font-size: 7.5pt;
+       text-transform: uppercase; letter-spacing: .08em; color: #5d6e68;
+       border-bottom: .8pt solid #cbd6d1; padding: 4pt 5pt; }
+  td { padding: 3.5pt 5pt; border-bottom: .4pt solid #dfe7e4; vertical-align: top; }
+  tr { page-break-inside: avoid; }
+  .box { border: .8pt solid #cbd6d1; padding: 8pt 10pt; margin: 6pt 0; }
+  .box.danger { border-left: 2.5pt solid #a4372a; background: #fbeeec; }
+  .box.good   { border-left: 2.5pt solid #1d6a57; background: #ecf5f2; }
+  .box.note   { border-left: 2.5pt solid #8a6210; background: #fbf4e6; }
+  .quote { font-family: ui-monospace, monospace; font-size: 8pt;
+           border-left: 2pt solid #8a6210; padding: 2pt 6pt; margin: 3pt 0; background: #fbf4e6; }
+  .hash { word-break: break-all; }
+  footer { margin-top: 18pt; border-top: .8pt solid #cbd6d1; padding-top: 6pt;
+           font-size: 8pt; color: #5d6e68; }
+  .pagebreak { page-break-before: always; }
+  ul { margin: 4pt 0; padding-left: 14pt; }
+  li { margin: 2pt 0; }
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <div class="kicker">Headwaters &middot; forensic investigation report</div>
+  <h1>{{ case.ref }}</h1>
+  <div class="mono muted">
+    Generated {{ generated_at.strftime('%Y-%m-%d %H:%M:%S UTC') }} &middot;
+    scoring weights {{ case.weights_version }} &middot;
+    data completeness {{ case.completeness }}/8
+  </div>
+</header>
+
+<div class="verdict">
+  <span class="score {{ 'crit' if case.band in ('critical','high') else 'warn' if case.band else 'ok' }}">{{ case.score }}</span>
+  <span class="band {{ 'crit' if case.band in ('critical','high') else 'warn' if case.band else 'ok' }}">
+    {{ (case.band or '').replace('_',' ') }}
+  </span>
+  <span class="mono muted">{{ (case.classification or '').replace('_',' ') }}</span>
+</div>
+
+<div class="box note">
+  <b>Scope of this report.</b> It states what was <i>recorded</i> at analysis
+  time, not what a re-run would produce today. Every figure is read back from the
+  case record. Where a signal group was not evaluated, the score is normalised
+  over the groups that were, and the completeness figure above says how many.
+</div>
+
+<h2>1 &middot; Message under examination</h2>
+<table>
+  <tr><th style="width:24%">Subject</th><td>{{ headers.get('subject','—') }}</td></tr>
+  <tr><th>From</th><td class="mono">{{ headers.get('from','—') }}</td></tr>
+  <tr><th>Reply-To</th><td class="mono">{{ headers.get('reply-to','—') }}</td></tr>
+  <tr><th>Return-Path</th><td class="mono">{{ headers.get('return-path','—') }}</td></tr>
+  <tr><th>To</th><td class="mono">{{ headers.get('to','—') }}</td></tr>
+  <tr><th>Date</th><td class="mono">{{ headers.get('date','—') }}</td></tr>
+  <tr><th>Message-ID</th><td class="mono">{{ headers.get('message-id','—') }}</td></tr>
+</table>
+
+{% if artifact %}
+<h3>Acquisition</h3>
+<table>
+  <tr><th style="width:24%">SHA-256 of original</th><td class="mono hash">{{ artifact[0] }}</td></tr>
+  <tr><th>Size</th><td class="mono">{{ artifact[1] }} bytes</td></tr>
+  <tr><th>Acquired</th><td class="mono">{{ artifact[3] }}</td></tr>
+  <tr><th>Source</th><td class="mono">{{ artifact[4] }}</td></tr>
+  <tr><th>Parse status</th><td class="mono">{{ artifact[5] }}</td></tr>
+</table>
+<p class="muted" style="font-size:8.5pt">
+  The digest was computed over the raw bytes <b>before any parsing</b>. It is the
+  anchor the chain of custody in section 7 hangs from.
+</p>
+{% endif %}
+
+<h2>2 &middot; Authentication</h2>
+{% if auth %}
+<table>
+  <tr><th>Mechanism</th><th>Reported</th><th>Aligned to visible From</th><th>Reporting server</th></tr>
+  {% for a in auth %}
+  <tr>
+    <td class="mono">{{ a[0]|upper }}</td>
+    <td class="mono {{ 'ok' if a[1]=='pass' else 'crit' }}">{{ a[1] }}</td>
+    <td class="{{ 'crit' if a[3] is false }}">
+      {% if a[3] is false %}<b>NOT ALIGNED</b>{% if a[4] %} (passed for {{ a[4] }}){% endif %}
+      {% elif a[3] %}aligned{% else %}not determinable{% endif %}
+    </td>
+    <td class="mono muted">{{ a[2] or '—' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<div class="box note">
+  Authentication asks whether a domain's published records match the message. It
+  does <b>not</b> ask whether the sender is who they claim to be. A sender who
+  registers their own lookalike domain and configures it correctly obtains a
+  legitimate pass, which is why alignment to the visible From address is reported
+  separately above.
+</div>
+{% else %}
+<p class="muted">No Authentication-Results from recognised infrastructure. Absence of evidence, not evidence of forgery.</p>
+{% endif %}
+
+<h2>3 &middot; Origin reconstruction</h2>
+{% if origin %}
+<div class="box {{ 'danger' if origin[0] else '' }}">
+  <div class="mono" style="font-size:11pt"><b>{{ origin[0] or 'Not determinable' }}</b>
+    &nbsp;confidence {{ origin[2] }}%</div>
+  <p style="margin:6pt 0 0">{{ origin[4] }}</p>
+</div>
+
+<h3>Confidence derivation</h3>
+<table>
+  <tr><th>Factor</th><th style="text-align:right;width:80pt">Contribution</th></tr>
+  {% for k, v in (origin[3] or {}).items() %}
+  <tr><td>{{ k.replace('_',' ') }}</td>
+      <td class="mono {{ 'crit' if v < 0 }}" style="text-align:right">{{ '+' if v > 0 }}{{ v }}</td></tr>
+  {% endfor %}
+  <tr><td><b>Total (clamped to 5–95; never 100)</b></td>
+      <td class="mono" style="text-align:right"><b>{{ origin[2] }}</b></td></tr>
+</table>
+
+<h3>Received chain</h3>
+<table>
+  <tr><th>#</th><th>Peer address observed</th><th>Received by</th><th>Trust</th><th>Anomalies</th></tr>
+  {% for h in hops %}
+  <tr>
+    <td class="mono">{{ h[0] }}</td>
+    <td class="mono">{{ h[2] or '—' }}</td>
+    <td class="mono muted">{{ h[3] or '—' }}</td>
+    <td class="mono {{ 'crit' if h[6] in ('forged','asserted') else 'ok' }}">{{ h[6] }}</td>
+    <td class="mono crit">{{ (h[8] or [])|join(', ') }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<p class="muted" style="font-size:8.5pt">
+  Hops marked <i>vouched</i> or <i>boundary</i> were recorded by infrastructure this
+  system recognises. Hops marked <i>asserted</i> were written by the sender and are
+  retained for completeness but are not scored and are not geolocated.
+  {% if not origin[5] %}No geolocation dataset is installed; no country is claimed.{% endif %}
+</p>
+{% else %}
+<p class="muted">No origin assessment recorded.</p>
+{% endif %}
+
+<h2>4 &middot; Findings</h2>
+<table>
+  <tr><th style="width:38pt">Sev</th><th>Finding</th><th style="width:96pt">Rule</th>
+      <th style="width:50pt;text-align:right">Points</th></tr>
+  {% for f in findings %}
+  <tr>
+    <td class="mono {{ 'crit' if f[2] in ('critical','high') else 'warn' }}">{{ f[2] }}</td>
+    <td>
+      <b>{{ f[3] }}</b>
+      {% if f[4] %}<div class="muted" style="font-size:8.5pt">{{ f[4] }}</div>{% endif %}
+      {% if f[7] %}<div class="quote">“{{ f[7] }}”</div>{% endif %}
+      {% if f[8] %}<div class="mono muted">MITRE {{ f[8] }}</div>{% endif %}
+    </td>
+    <td class="mono muted">{{ f[1] }}</td>
+    <td class="mono" style="text-align:right">{{ '%.2f'|format(f[5]) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if mitre %}
+<h3>MITRE ATT&amp;CK</h3>
+<p class="mono">{{ mitre|join(' · ') }}</p>
+<p class="muted" style="font-size:8.5pt">
+  Techniques are derived from the rules that fired, not assigned to the case as a
+  whole.
+</p>
+{% endif %}
+
+<h2>5 &middot; Indicators of compromise</h2>
+<table>
+  <tr><th style="width:90pt">Type</th><th>Value</th></tr>
+  {% for i in indicators %}
+  <tr><td class="mono muted">{{ i[0] }}</td><td class="mono" style="word-break:break-all">{{ i[1] }}</td></tr>
+  {% endfor %}
+</table>
+
+<h2>6 &middot; Campaign correlation</h2>
+{% if campaign %}
+<div class="box">
+  <b class="mono">{{ campaign[0] }}</b> &middot; {{ campaign[1] }} cases<br>
+  Linked by {{ campaign[2] }}. Similarity {{ '%.3f'|format(campaign[3]) }}.
+</div>
+<div class="box note">
+  <b>Operational linkage hypothesis, not attribution.</b> Shared tooling can
+  indicate one actor, one purchased phishing kit, or one phishing-as-a-service
+  platform used by many unrelated actors. This report does not identify a person
+  or an organisation as responsible.
+</div>
+{% else %}
+<p class="muted">No campaign linkage established for this case.</p>
+{% endif %}
+
+<div class="pagebreak"></div>
+<h2>7 &middot; Evidence integrity</h2>
+<div class="box {{ 'good' if verification.intact else 'danger' }}">
+  <b>{{ 'CHAIN INTACT' if verification.intact else 'CHAIN BROKEN' }}</b><br>
+  {{ verification.summary }}
+</div>
+<table>
+  <tr><th style="width:24%">Merkle root</th><td class="mono hash">{{ verification.merkle_root }}</td></tr>
+  <tr><th>Signing key id</th><td class="mono">{{ verification.signing_key_id }}</td></tr>
+  <tr><th>Public key (Ed25519, base64)</th><td class="mono hash">{{ verification.public_key }}</td></tr>
+</table>
+<p class="muted" style="font-size:8.5pt">
+  The public key is printed so a third party can verify these signatures without
+  access to this system. A hash chain proves the log is internally consistent; it
+  does not prove the log was never rewritten in full, which is why the root is
+  anchored externally.
+</p>
+
+<h3>Chain of custody</h3>
+<table>
+  <tr><th style="width:20pt">#</th><th style="width:120pt">Timestamp</th><th>Action</th>
+      <th>Actor</th><th style="width:110pt">Entry hash</th></tr>
+  {% for e in events %}
+  <tr>
+    <td class="mono">{{ e[0] }}</td>
+    <td class="mono muted">{{ e[1].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    <td class="mono">{{ e[3] }}</td>
+    <td class="mono muted">{{ e[2] }}</td>
+    <td class="mono">{{ e[5][:20] }}…</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>8 &middot; Certificate under Section 63, Bharatiya Sakshya Adhiniyam 2023</h2>
+<p class="muted" style="font-size:8.5pt">
+  Successor provision to Section 65B of the Indian Evidence Act 1872. Pre-filled
+  for signature by a responsible officer. Admissibility is a judicial
+  determination; this certificate records the particulars a court asks for.
+</p>
+<table>
+  <tr><th style="width:32%">Electronic record produced</th>
+      <td>Forensic analysis of the electronic mail message identified as {{ case.ref }},
+          the original of which bears SHA-256
+          <span class="mono hash">{{ artifact[0] if artifact else '—' }}</span>.</td></tr>
+  <tr><th>Manner of production</th>
+      <td>Produced by the Headwaters email forensic platform operating automatically
+          over the electronic record, during the period in which it was in regular
+          use for storing and processing information for the activities regularly
+          carried on over that period.</td></tr>
+  <tr><th>Particulars of the device</th>
+      <td class="mono">Headwaters analysis service, scoring weights {{ case.weights_version }},
+          evidence signing key {{ verification.signing_key_id }}.</td></tr>
+  <tr><th>Proper operation</th>
+      <td>The computer was operating properly throughout the material period. The
+          integrity of the record is evidenced by the hash chain in section 7, which
+          verified as <b>{{ 'INTACT' if verification.intact else 'BROKEN' }}</b> at the
+          time of generation.</td></tr>
+  <tr><th>Signature</th>
+      <td style="height:46pt">
+        <div class="muted" style="font-size:8.5pt">Name, designation and signature of the responsible officer</div>
+      </td></tr>
+</table>
+
+<footer>
+  Headwaters &middot; {{ case.ref }} &middot; report hash is recorded separately in the
+  case record. This document reports probable sending infrastructure and never
+  asserts the physical location or identity of any person.
+</footer>
+</body>
+</html>

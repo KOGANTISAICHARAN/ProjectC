@@ -1,0 +1,33 @@
+.hw-btn {
+  /* position/z-index/pointer-events are defensive: Gmail's toolbar layers
+     overlays that can otherwise sit on top of an injected control and make it
+     look rendered but dead. */
+  position: relative; z-index: 10; pointer-events: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-left: 8px; padding: 6px 12px;
+  font: 500 13px/1 "Google Sans", Roboto, system-ui, sans-serif;
+  color: #1d6a57; background: #fff;
+  border: 1px solid #1d6a57; border-radius: 4px; cursor: pointer;
+}
+.hw-btn:hover { background: #1d6a57; color: #fff; }
+.hw-btn[disabled] { opacity: .55; cursor: default; }
+
+.hw-card {
+  margin: 12px 0; padding: 14px 16px;
+  border-left: 4px solid #999; border-radius: 4px; background: #f6f8f7;
+  font: 13px/1.5 Roboto, system-ui, sans-serif; color: #111917;
+}
+.hw-card.hw-critical { border-left-color: #a4372a; background: #fbeeec; }
+.hw-card.hw-warn     { border-left-color: #8a6210; background: #fbf4e6; }
+.hw-card.hw-benign   { border-left-color: #1d6a57; background: #ecf5f2; }
+.hw-card .hw-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.hw-card .hw-score { font: 700 22px/1 ui-monospace, monospace; }
+.hw-card .hw-label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 12px; }
+.hw-card .hw-advice { opacity: .85; }
+.hw-card a { color: inherit; font-weight: 600; }
+.hw-card .hw-foot { margin-top: 8px; font: 11px ui-monospace, monospace; opacity: .6; }
+
+.hw-card .hw-analysed {
+  margin: 2px 0 6px; font: 11px/1.4 ui-monospace, SFMono-Regular, monospace;
+  opacity: .65; overflow-wrap: anywhere;
+}

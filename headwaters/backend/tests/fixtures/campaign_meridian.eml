@@ -1,0 +1,58 @@
+Received: from IN-BLR-02.mail.protection.outlook.com (10.30.7.11) by
+ mailgw.kaverifs.com (10.30.7.2) with Microsoft SMTP Server id
+ 15.20.7429.19; Thu, 21 Aug 2026 14:22:09 +0530
+Received: from BLRPR02MB7781.indprd01.prod.outlook.com (2001:db8:9::21) by
+ IN-BLR-02.mail.protection.outlook.com (2001:db8:9::4) with Microsoft SMTP
+ Server id 15.20.7429.19; Thu, 21 Aug 2026 14:22:01 +0530
+Received: from mx-out.meridian-corp.test (203.0.113.88) by
+ BLRPR02MB7781.indprd01.prod.outlook.com (2001:db8:9::21) with Microsoft SMTP
+ Server id 15.20.7429.19 via Frontend Transport; Thu, 21 Aug 2026 14:21:52 +0530
+Received: from vps-41-ams (198.51.100.23) by mx-out.meridian-corp.test
+ (203.0.113.88) with ESMTP id 7c33a1b2; Thu, 21 Aug 2026 14:20:44 +0530
+Authentication-Results: kaverifs.com; spf=pass (sender IP is 203.0.113.88)
+ smtp.mailfrom=mail.meridian-corp.test; dkim=pass (signature was verified)
+ header.d=meridian-corp.test header.s=selector1; dmarc=pass action=none
+ header.from=meridian-corp.test
+Return-Path: <bounce-4417@mail.meridian-corp.test>
+From: "Rohit Verma" <r.verma@meridian-corp.test>
+Reply-To: r.verma@meridian-corp.net
+To: "Accounts Payable" <ap@meridiancapital.test>
+Subject: Re: Q3 supplier settlement - action needed before cutoff
+Date: Thu, 21 Aug 2026 14:19:31 +0530
+Message-ID: <20260821T0849.7c33a1@vps-41-ams.hostwinds.test>
+X-Mailer: PHPMailer 6.9.1
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="b1_7c33a144172"
+
+--b1_7c33a144172
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Team,
+
+The Q3 supplier settlement must be released before the cutoff today or the
+discount lapses. Updated remittance details are attached.
+
+Please do not discuss this with anyone outside finance until the quarter
+closes on Monday.
+
+I am travelling and in meetings, so do not call; confirm via the supplier
+portal instead:
+https://meridian-corp.test/supplier-portal/verify?ref=MC-44172
+
+Amount: INR 62,40,000. This is time-critical.
+
+Rohit Verma
+Chief Financial Officer
+Meridian Capital Advisors
+Sent from my iPhone
+
+--b1_7c33a144172
+Content-Type: application/pdf; name="Updated_Remittance_Meridian.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="Updated_Remittance_Meridian.pdf"
+
+JVBERi0xLjQKJSBTeW50aGV0aWMgZGVtbyBhdHRhY2htZW50LiBCZW5lZmljaWFyeTogQUMgODgw
+MTIyNDQ5OTAxIC8gSUZTQyBURVNUMDAwMDg4OAo=
+
+--b1_7c33a144172--

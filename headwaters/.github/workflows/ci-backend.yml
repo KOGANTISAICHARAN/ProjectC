@@ -1,0 +1,87 @@
+name: backend
+
+on:
+  pull_request:
+    paths: ["backend/**", ".github/workflows/ci-backend.yml"]
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/ci-backend.yml"]
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: headwaters
+          POSTGRES_PASSWORD: headwaters
+          POSTGRES_DB: headwaters
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U headwaters"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      # Privileged: migrations, bootstrap, worker.
+      DATABASE_URL: postgresql+psycopg://headwaters:headwaters@localhost:5432/headwaters
+      # Unprivileged: the request path. The guard tests assert this role cannot
+      # bypass RLS, so CI must exercise the same split as production.
+      DATABASE_URL_APP: postgresql+psycopg://headwaters_app:ci-only@localhost:5432/headwaters
+      APP_DB_PASSWORD: ci-only
+      ENVIRONMENT: local
+      ALLOWED_ORIGINS: http://localhost:3100,http://example.test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv pip install --system '.[dev]'
+
+      - name: Lint
+        run: ruff check . && ruff format --check .
+
+      - name: Type check
+        run: mypy app
+
+      # The schema and the application role must exist before the tenancy and
+      # queue tests can mean anything.
+      - name: Migrate and bootstrap
+        run: alembic upgrade head && python -m app.db.bootstrap
+
+      - name: Tests
+        run: pytest --cov=app --cov-report=term-missing
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv pip install --system '.[dev]'
+      # Known CVEs in the dependency tree.
+      - name: Dependency audit
+        run: pip-audit
+      # Python security anti-patterns. -ll = medium severity and above.
+      - name: Static security analysis
+        run: bandit -r app -ll
+
+  secrets:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      # A committed credential is the one failure this project cannot recover
+      # from cleanly, so it blocks the merge rather than warning.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* Analyst dashboards are read in dark rooms at 2am and in bright ones at 9am.
+   Both themes are first-class; tokens are defined once and swapped. */
+@theme {
+  --color-ink: #111917;
+  --color-paper: #edf1ef;
+  --color-surface: #fafcfb;
+  --color-line: #cbd6d1;
+  --color-accent: #1d6a57;
+  --color-critical: #a4372a;
+  --color-warn: #8a6210;
+  --color-trust: #3a6480;
+}
+
+html { color-scheme: light dark; }
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #0c120f; color: #e2eae6; }
+}

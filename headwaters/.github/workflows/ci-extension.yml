@@ -1,0 +1,39 @@
+name: extension
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [main]
+    paths: ["extension/**", ".github/workflows/ci-extension.yml"]
+  pull_request:
+    paths: ["extension/**"]
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+
+      # No bundler: the extension is plain ES modules by design, so the only
+      # build step that can fail is a syntax error, and it should fail loudly.
+      - name: Syntax check
+        run: |
+          node --check extension/background.js
+          node --check extension/content/gmail.js
+          node -e 'JSON.parse(require("fs").readFileSync("extension/manifest.json"))'
+
+      - name: Package
+        run: cd extension && zip -qr ../headwaters-extension.zip . -x '*.DS_Store'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: headwaters-extension
+          path: headwaters-extension.zip
+
+      # Judges install from the release ZIP: Developer mode, Load unpacked.
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: headwaters-extension.zip

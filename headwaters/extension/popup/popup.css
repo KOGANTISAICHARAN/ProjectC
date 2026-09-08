@@ -1,0 +1,46 @@
+:root { color-scheme: light; }
+body {
+  width: 320px; margin: 0; padding: 14px;
+  font: 13px/1.5 Roboto, system-ui, sans-serif;
+  color: #111917; background: #edf1ef;
+}
+header { border-bottom: 2px solid #111917; padding-bottom: 8px; margin-bottom: 12px; }
+h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.sub { margin: 2px 0 0; font: 11px ui-monospace, monospace; letter-spacing: .12em;
+       text-transform: uppercase; opacity: .55; }
+
+.status { padding: 8px 10px; margin-bottom: 10px; background: #fafcfb;
+          border: 1px solid #cbd6d1; font: 11px ui-monospace, monospace; }
+.status.ok   { color: #1d6a57; border-color: #1d6a57; }
+.status.bad  { color: #a4372a; border-color: #a4372a; }
+
+.verdict { padding: 12px; margin-bottom: 12px; border-left: 4px solid #999; background: #fafcfb; }
+.verdict.critical { border-left-color: #a4372a; background: #fbeeec; }
+.verdict.warn     { border-left-color: #8a6210; background: #fbf4e6; }
+.verdict.benign   { border-left-color: #1d6a57; background: #ecf5f2; }
+.verdict .row { display: flex; align-items: baseline; gap: 10px; }
+.verdict .score { font: 700 22px/1 ui-monospace, monospace; }
+.verdict .band { font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.verdict p { margin: 6px 0 0; }
+
+.actions { display: flex; flex-direction: column; gap: 8px; }
+.hint { margin: 0; font-size: 12px; opacity: .7; }
+button {
+  padding: 8px 10px; font: 600 13px Roboto, system-ui, sans-serif;
+  color: #fff; background: #1d6a57; border: 0; border-radius: 3px; cursor: pointer;
+}
+button[disabled] { opacity: .55; cursor: default; }
+a { font-size: 12px; color: #1d6a57; }
+
+footer { margin-top: 14px; padding-top: 10px; border-top: 1px solid #cbd6d1;
+         font-size: 11px; opacity: .55; }
+
+.sample-badge {
+  margin-left: auto; padding: 2px 6px; border: 1px solid #8a6210; color: #8a6210;
+  font: 500 9px/1 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase;
+}
+.analysed {
+  margin: 6px 0 0; font: 11px/1.4 ui-monospace, monospace;
+  overflow-wrap: anywhere; opacity: .8;
+}
+.analysed.from { margin-top: 1px; opacity: .55; }

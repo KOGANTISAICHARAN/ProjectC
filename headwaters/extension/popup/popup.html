@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="popup.css" />
+  <title>Headwaters</title>
+</head>
+<body>
+  <header>
+    <h1>Headwaters</h1>
+    <p class="sub">Email forensics</p>
+  </header>
+
+  <div id="status" class="status">Checking service…</div>
+  <div id="verdict" class="verdict" hidden></div>
+
+  <section class="actions">
+    <p class="hint">On a Gmail message, use <b>Check this email</b> in the toolbar.</p>
+    <button id="sample" type="button">Try a sample email</button>
+    <a id="dashboard" href="#" target="_blank" rel="noreferrer">Open analyst dashboard →</a>
+  </section>
+
+  <footer>
+    Deterministic forensics establish fact.<br />Reports probable infrastructure, never a person.
+  </footer>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

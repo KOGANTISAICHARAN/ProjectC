@@ -1,0 +1,55 @@
+Received: from IN-MUM-01.mail.protection.outlook.com (10.20.4.11) by
+ mailgw.kaverifs.com (10.20.4.2) with Microsoft SMTP Server id 15.20.7429.19;
+ Fri, 29 Aug 2026 11:08:52 +0530
+Received: from MUMPR01MB4417.indprd01.prod.outlook.com (2001:db8:2::17) by
+ IN-MUM-01.mail.protection.outlook.com (2001:db8:2::4) with Microsoft SMTP
+ Server id 15.20.7429.19; Fri, 29 Aug 2026 11:08:44 +0530
+Received: from relay.kfs-invoices.test (203.0.113.57) by
+ MUMPR01MB4417.indprd01.prod.outlook.com (2001:db8:2::17) with Microsoft SMTP
+ Server id 15.20.7429.19 via Frontend Transport; Fri, 29 Aug 2026 11:08:31 +0530
+Received: from vps-77-lon (198.51.100.9) by relay.kfs-invoices.test
+ (203.0.113.57) with ESMTP id 2e91c4f0; Fri, 29 Aug 2026 11:07:12 +0530
+Authentication-Results: kaverifs.com; spf=pass (sender IP is 203.0.113.57)
+ smtp.mailfrom=mail.kfs-invoices.test; dkim=pass (signature was verified)
+ header.d=kfs-invoices.test header.s=selector1; dmarc=pass action=none
+ header.from=kfs-invoices.test
+Return-Path: <bounce-2291@mail.kfs-invoices.test>
+From: "Kaveri Accounts" <billing@kfs-invoices.test>
+Reply-To: billing@kfs-invoices.net
+To: "Priya Menon" <p.menon@kaverifs.com>
+Subject: Outstanding invoice KFS-22910 requires authorisation today
+Date: Fri, 29 Aug 2026 11:06:03 +0530
+Message-ID: <20260829T0536.2e91c4@vps-77-lon.hostwinds.test>
+X-Mailer: PHPMailer 6.9.1
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="b1_2e91c422910"
+
+--b1_2e91c422910
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Hello,
+
+Invoice KFS-22910 remains outstanding and must be authorised today to avoid
+suspension of the account.
+
+Updated banking details are attached. Please do not discuss this with the
+vendor directly until the reconciliation is complete.
+
+Confirm through the billing portal:
+https://kfs-invoices.test/billing-portal/verify?ref=KFS-22910
+
+Amount: INR 18,95,000. This is time-critical.
+
+Kaveri Accounts Team
+Sent from my iPhone
+
+--b1_2e91c422910
+Content-Type: application/pdf; name="Invoice_KFS_22910.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="Invoice_KFS_22910.pdf"
+
+JVBERi0xLjQKJSBTeW50aGV0aWMgZGVtbyBhdHRhY2htZW50LiBCZW5lZmljaWFyeTogQUMgNzcx
+MDMzNTUyMjExIC8gSUZTQyBURVNUMDAwMDc3Nwo=
+
+--b1_2e91c422910--

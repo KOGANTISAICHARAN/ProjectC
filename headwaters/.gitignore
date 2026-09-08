@@ -1,0 +1,41 @@
+# --- secrets (the only truly unforgivable commit) --------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+!**/script.py.mako
+
+# --- python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+*.egg-info/
+
+# --- node ------------------------------------------------------------------
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# --- evidence & data -------------------------------------------------------
+# Raw email is evidence. It never enters version control, not even a sample
+# that "looks harmless" — the corpus in tests/fixtures/ is synthetic and is the
+# only email that is committed.
+storage/
+*.local.eml
+
+# --- tooling ---------------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# Packaged extension artifact
+dist/

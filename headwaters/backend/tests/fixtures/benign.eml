@@ -1,0 +1,32 @@
+Received: from mail-lf1-f54.google.com (209.85.167.54) by
+ mailgw.kaverifs.com (10.20.4.2) with Microsoft SMTP Server id 15.20.7429.19;
+ Mon, 1 Sep 2026 11:02:14 +0530
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53f1a2c8e11so
+ for <p.menon@kaverifs.com>; Mon, 01 Sep 2026 11:02:10 +0530
+Authentication-Results: kaverifs.com; spf=pass (sender IP is 209.85.167.54)
+ smtp.mailfrom=bounce.quarterlyreview.example; dkim=pass (signature verified)
+ header.d=quarterlyreview.example header.s=k1; dmarc=pass action=none
+ header.from=quarterlyreview.example
+Return-Path: <bounce-42@bounce.quarterlyreview.example>
+From: "Quarterly Review Digest" <digest@quarterlyreview.example>
+Reply-To: replies@quarterlyreview.example
+To: "Priya Menon" <p.menon@kaverifs.com>
+Subject: Your September infrastructure digest is ready
+Date: Mon, 1 Sep 2026 11:01:55 +0530
+Message-ID: <20260901.11a2f3@quarterlyreview.example>
+List-Id: <digest.quarterlyreview.example>
+List-Unsubscribe: <https://quarterlyreview.example/unsubscribe?id=42>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Hello Priya,
+
+Your September digest is ready. This month we cover capacity planning,
+observability budgets, and a short piece on incident retrospectives.
+
+Read it here: https://quarterlyreview.example/issues/2026-09
+
+You are receiving this because you subscribed in March 2025.
+Unsubscribe: https://quarterlyreview.example/unsubscribe?id=42
+
+- The Quarterly Review team

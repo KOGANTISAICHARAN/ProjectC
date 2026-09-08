@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Headwaters — Email Forensics",
+  "version": "0.2.0",
+  "description": "Check a suspicious email against your organisation's forensic engine, without leaving Gmail.",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "http://127.0.0.1:8000/*"
+  ],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content/gmail.js"],
+      "css": ["content/gmail.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Headwaters"
+  },
+  "icons": { "128": "icons/icon128.png" }
+}

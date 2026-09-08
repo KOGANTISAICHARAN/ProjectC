@@ -1,0 +1,55 @@
+# Risk fusion weights, version 1.
+#
+# Versioned deliberately: `cases.weights_version` records which file produced a
+# score, and the value is written into the evidence chain, so a re-run years
+# later is comparable. Changing a number here is a release event.
+version: v1
+
+# The eight signal groups. Weights sum to 100.
+#
+# Content is deliberately NOT the largest. Urgency, authority and secrecy are
+# modifiers of risk, not sources of it -- a real CFO writes urgent confidential
+# payment requests, and a system that scores tone heavily flags them.
+groups:
+  authentication:  18   # DMARC evaluation, alignment to the claimed identity, forged A-R
+  identity:        16   # display-name spoofing, lookalike domains, Reply-To divergence
+  url_domain:      15   # domain age, redirects, credential landing pages, reputation
+  infrastructure:  12   # FEOS network type, forged Received headers, prior prefix sightings
+  content:         12   # social engineering (AI layer, Phase 7) -- capped, see below
+  threat_intel:    10   # URL/domain/IP/hash hits, weighted by source reliability
+  attachment:       9   # type mismatch, macros, archives, hash reputation
+  campaign:         8   # DNA similarity to a confirmed-malicious case
+
+bands:
+  benign:            [0, 19]
+  suspicious:        [20, 39]
+  likely_malicious:  [40, 64]
+  high:              [65, 84]
+  critical:          [85, 100]
+
+controls:
+  # A Critical verdict requires at least two independent groups scoring >= 0.70,
+  # of which at least one must be deterministic (not content, not campaign).
+  # Without that the score is hard-capped at the top of High -- which still
+  # escalates, but does not carry the strongest claim.
+  corroboration:
+    required_groups: 2
+    group_threshold: 0.70
+    deterministic_required: 1
+    cap_without_corroboration: 84
+
+  # The AI content group can never on its own take a case above this.
+  ai_ceiling: 65
+
+  # Applied when DMARC passes with alignment to an established domain and no
+  # adverse signal. Without a dampener the false-positive rate on legitimate
+  # mail is embarrassing -- and a judge will upload their own newsletter.
+  legitimacy_dampener: -12
+
+deterministic_groups:
+  - authentication
+  - identity
+  - url_domain
+  - infrastructure
+  - attachment
+  - threat_intel

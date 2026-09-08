@@ -1,0 +1,37 @@
+name: frontend
+
+on:
+  pull_request:
+    paths: ["frontend/**", ".github/workflows/ci-frontend.yml"]
+  push:
+    branches: [main]
+    paths: ["frontend/**", ".github/workflows/ci-frontend.yml"]
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package.json
+
+      - run: npm install --no-audit --no-fund
+      - name: Type check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      # Build is a merge gate only. Vercel's Git integration performs the
+      # actual deploy, with a preview URL per pull request.
+      - name: Build
+        run: npm run build
